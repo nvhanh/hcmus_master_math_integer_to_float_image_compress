@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Common.h"
-#include "opencv2/opencv.hpp"
 
 BEG_NSP_APP();
 
@@ -9,14 +8,18 @@ BEG_NSP_APP();
 class RawImg {
 public:
 	RawImg();
+	RawImg(const RawImg& otherImg);
 	RawImg(const std::string& fileName);
 	~RawImg();
 
-	int32_t show(const std::string& windowsName = "image", cv::Size maxSize = cv::Size(1280, 720));
+	int32_t show(const std::string& windowsName = "image", int32_t maxWidth = 1280, int32_t maxHeigth = 720);
 	bool isValidImg();
 
-protected:
-	cv::Mat _img;
+public:
+	uint8_t* buffer;
+	int32_t bufferLength;
+	int32_t width;
+	int32_t heigth;
 };
 
 
