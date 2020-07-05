@@ -11,6 +11,7 @@ struct ErrCode {
 		kSuccess = 0,
 		kFailed = -1,
 		kInvalidImg = -2,
+		kSaveFileFailed = -3,
 	};
 };
 

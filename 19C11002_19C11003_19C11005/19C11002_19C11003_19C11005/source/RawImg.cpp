@@ -91,3 +91,11 @@ int32_t RawImg::show(const std::string& windowsName, int32_t maxWidth, int32_t m
 	return ErrCode::kSuccess;
 }
 
+int32_t RawImg::save(const std::string& fileName) {
+	if (!isValidImg()) {
+		return ErrCode::kInvalidImg;
+	}
+
+	Mat img(cv::Size(width, heigth), CV_8UC3, buffer);
+	return imwrite(fileName, img) ? ErrCode::kSuccess : ErrCode::kSaveFileFailed;
+}

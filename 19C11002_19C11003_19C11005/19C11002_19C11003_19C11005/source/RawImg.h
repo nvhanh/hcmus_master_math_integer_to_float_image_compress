@@ -13,8 +13,9 @@ public:
 	~RawImg();
 
 	void reset();
-	int32_t show(const std::string& windowsName = "image", int32_t maxWidth = 1280, int32_t maxHeigth = 720);
 	bool isValidImg();
+	int32_t show(const std::string& windowsName = "image", int32_t maxWidth = 1280, int32_t maxHeigth = 720);
+	int32_t save(const std::string& fileName);
 
 public:
 	uint8_t* buffer;
