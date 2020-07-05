@@ -15,7 +15,13 @@ int main()
 		return 0;
 	}
 
+	EncodedImg encodedImg;
+	ImgEncDec::encodeImg(rawImg, encodedImg);
 
+	RawImg decodedImg;
+	ImgEncDec::decodeImg(encodedImg, decodedImg);
+
+	decodedImg.show("decoded image");
 
 	return 0;
 }

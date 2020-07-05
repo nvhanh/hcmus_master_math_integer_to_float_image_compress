@@ -13,11 +13,16 @@ RawImg::RawImg() :
 	heigth(0) {
 }
 
-RawImg::RawImg(const RawImg& otherImg) :
-RawImg() {
+RawImg::RawImg(const RawImg& otherImg) {
+	if (this == &otherImg)
+		return;
+
+	reset();
+
 	bufferLength = otherImg.bufferLength;
 	width = otherImg.width;
 	heigth = otherImg.heigth;
+	buffer = new uint8_t[bufferLength];
 
 	if (bufferLength > 0)
 		memcpy(buffer, otherImg.buffer, bufferLength);
@@ -41,6 +46,10 @@ RawImg() {
 }
 
 RawImg::~RawImg() {
+	reset();
+}
+
+void RawImg::reset() {
 	if (!buffer)
 		delete[] buffer;
 

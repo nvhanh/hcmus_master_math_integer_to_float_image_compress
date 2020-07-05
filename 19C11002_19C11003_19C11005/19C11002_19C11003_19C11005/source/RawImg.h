@@ -12,6 +12,7 @@ public:
 	RawImg(const std::string& fileName);
 	~RawImg();
 
+	void reset();
 	int32_t show(const std::string& windowsName = "image", int32_t maxWidth = 1280, int32_t maxHeigth = 720);
 	bool isValidImg();
 
