@@ -21,7 +21,7 @@ int main()
 	RawImg decodedImg;
 	ImgEncDec::decodeImg(encodedImg, decodedImg);
 
-	decodedImg.save("imgs/decoded.jpg");
+	decodedImg.save("imgs/decoded_float.jpg");
 	decodedImg.show("decoded image");
 
 	return 0;

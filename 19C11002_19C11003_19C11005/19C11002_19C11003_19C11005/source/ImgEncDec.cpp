@@ -24,16 +24,13 @@ inline void modifyBit(uint16_t& val, size_t pos, uint8_t bitVal) {
 
 int32_t ImgEncDec::encodeImg(const RawImg& rawImg, EncodedImg& encodedImg) {
 	encodedImg.reset();
-	encodedImg.rawIntVal.clear();
-
-	int32_t numFloatVal = (rawImg.bufferLength + 15) / 16;
+	
+	int32_t numfloatVal = (rawImg.bufferLength + 15) / 16;
 	encodedImg.width = rawImg.width;
 	encodedImg.heigth = rawImg.heigth;
-	encodedImg.bufferLength = numFloatVal;
-	encodedImg.buffer = new double[numFloatVal];
-	memset(encodedImg.buffer, 0, numFloatVal);
-
-	encodedImg.rawIntVal.resize(numFloatVal);
+	encodedImg.bufferLength = numfloatVal;
+	encodedImg.buffer = new float[numfloatVal];
+	memset(encodedImg.buffer, 0, numfloatVal);
 
 	float powArr[8];
 	powArr[0] = pow(2, 128 - (0 + 1) * 16);
@@ -45,9 +42,8 @@ int32_t ImgEncDec::encodeImg(const RawImg& rawImg, EncodedImg& encodedImg) {
 	powArr[6] = pow(2, 128 - (6 + 1) * 16);
 	powArr[7] = pow(2, 128 - (7 + 1) * 16);
 
-	for (size_t chunk = 0; chunk < numFloatVal - 1; chunk++) {
+	for (size_t chunk = 0; chunk < numfloatVal - 1; chunk++) {
 		encodedImg.buffer[chunk] = 0;
-		encodedImg.rawIntVal[chunk].resize(8);
 
 		size_t rawBufferIdx = chunk * 16;
 		for (uint8_t bitPos = 0; bitPos < 8; bitPos++) {
@@ -71,12 +67,10 @@ int32_t ImgEncDec::encodeImg(const RawImg& rawImg, EncodedImg& encodedImg) {
 			modifyBit(intVal, 15, getBit(rawImg.buffer[rawBufferIdx + 15], 8 - bitPos));
 
 			encodedImg.buffer[chunk] += intVal * powArr[bitPos];
-			encodedImg.rawIntVal[chunk][bitPos] = intVal;
 		}
 	}
 
 	/// pading
-	encodedImg.rawIntVal[numFloatVal - 1].resize(8);
 
 	return ErrCode::kFailed;
 }
@@ -102,18 +96,13 @@ int32_t ImgEncDec::decodeImg(const EncodedImg& encodedImg, RawImg& decodedImg) {
 	powArr[7] = pow(2, 128 - (7 + 1) * 16);
 
 	for (size_t chunk = 0; chunk < encodedImg.bufferLength; chunk++) {
-		double chunkVal = encodedImg.buffer[chunk];
+		float chunkVal = encodedImg.buffer[chunk];
 
 		size_t rawBufferIdx = chunk * 16;
-
-		//std::cout << chunkVal << "|";
 		for (uint8_t bitPos = 0; bitPos < 8; bitPos++) {
 			uint16_t intVal = chunkVal / powArr[bitPos];
-			chunkVal -= powArr[bitPos];
-
-			//intVal = encodedImg.rawIntVal[chunk][bitPos];
-			//std::cout << intVal << " ";
-
+			chunkVal -= powArr[bitPos] * intVal;
+			
 			modifyBit(decodedImg.buffer[rawBufferIdx], 8 - bitPos, getBit(intVal, 0));
 			modifyBit(decodedImg.buffer[rawBufferIdx + 1], 8 - bitPos, getBit(intVal, 1));
 			modifyBit(decodedImg.buffer[rawBufferIdx + 2], 8 - bitPos, getBit(intVal, 2));
@@ -130,10 +119,6 @@ int32_t ImgEncDec::decodeImg(const EncodedImg& encodedImg, RawImg& decodedImg) {
 			modifyBit(decodedImg.buffer[rawBufferIdx + 13], 8 - bitPos, getBit(intVal, 13));
 			modifyBit(decodedImg.buffer[rawBufferIdx + 14], 8 - bitPos, getBit(intVal, 14));
 			modifyBit(decodedImg.buffer[rawBufferIdx + 15], 8 - bitPos, getBit(intVal, 15));
-		}
-
-		for (int i = 0; i < 16; i++) {
-			//std::cout << (int)decodedImg.buffer[rawBufferIdx + i] << " ";
 		}
 	}
 

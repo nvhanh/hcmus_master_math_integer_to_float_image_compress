@@ -19,7 +19,7 @@ EncodedImg::EncodedImg(const EncodedImg& otherImg) {
 	bufferLength = otherImg.bufferLength;
 	width = otherImg.width;
 	heigth = otherImg.heigth;
-	buffer = new double[bufferLength];
+	buffer = new float[bufferLength];
 
 	if (bufferLength > 0)
 		memcpy(buffer, otherImg.buffer, bufferLength);

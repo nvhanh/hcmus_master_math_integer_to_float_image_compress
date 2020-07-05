@@ -16,12 +16,10 @@ public:
 	int32_t fromEncodedFile(const std::string& encodedFile);
 
 public:
-	double* buffer;
+	float* buffer;
 	int32_t bufferLength;
 	int32_t width;
 	int32_t heigth;
-
-	std::vector<std::vector<uint16_t> > rawIntVal;
 };
 
 END_NSP_APP();
