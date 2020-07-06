@@ -13,10 +13,12 @@ public:
 	~EncodedImg();
 
 	void reset();
-	int32_t fromEncodedFile(const std::string& encodedFile);
+	bool isValidImg();
+	int32_t fromFile(const std::string& encodedFile);
+	int32_t saveFile(const std::string& encodedFile);
 
 public:
-	float* buffer;
+	double* buffer;
 	int32_t bufferLength;
 	int32_t width;
 	int32_t heigth;

@@ -17,11 +17,15 @@ int main()
 
 	EncodedImg encodedImg;
 	ImgEncDec::encodeImg(rawImg, encodedImg);
+	encodedImg.saveFile("imgs/encoded.ssd");
+
+	EncodedImg encodedImg2;
+	encodedImg2.fromFile("imgs/encoded.ssd");
 
 	RawImg decodedImg;
-	ImgEncDec::decodeImg(encodedImg, decodedImg);
+	ImgEncDec::decodeImg(encodedImg2, decodedImg);
 
-	decodedImg.save("imgs/decoded_float.jpg");
+	decodedImg.save("imgs/decoded_double.jpg");
 	decodedImg.show("decoded image");
 
 	return 0;

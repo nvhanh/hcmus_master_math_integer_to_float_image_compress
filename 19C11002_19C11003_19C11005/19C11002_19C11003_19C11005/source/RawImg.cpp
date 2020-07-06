@@ -78,7 +78,7 @@ int32_t RawImg::show(const std::string& windowsName, int32_t maxWidth, int32_t m
 	else {
 		cv::Mat tmp = img.clone();
 		cv::Size curSize = tmp.size();
-		cv::Size newSize = curSize.width / (float)maxWidth > curSize.height / (float)maxHeigth
+		cv::Size newSize = curSize.width / (double)maxWidth > curSize.height / (double)maxHeigth
 			? cv::Size(maxWidth, curSize.height * maxWidth / curSize.width)
 			: cv::Size(curSize.width * maxHeigth / curSize.height, maxHeigth);
 

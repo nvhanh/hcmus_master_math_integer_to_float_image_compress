@@ -1,6 +1,10 @@
 #include "EncodedImg.h"
+#include <fstream>
+
+#define SEGMENT_SIZE 32768
 
 USG_NSP_APP();
+using namespace std;
 
 EncodedImg::EncodedImg() :
 buffer(nullptr),
@@ -19,7 +23,7 @@ EncodedImg::EncodedImg(const EncodedImg& otherImg) {
 	bufferLength = otherImg.bufferLength;
 	width = otherImg.width;
 	heigth = otherImg.heigth;
-	buffer = new float[bufferLength];
+	buffer = new double[bufferLength];
 
 	if (bufferLength > 0)
 		memcpy(buffer, otherImg.buffer, bufferLength);
@@ -44,6 +48,64 @@ void EncodedImg::reset() {
 	heigth = 0;
 }
 
-int32_t EncodedImg::fromEncodedFile(const std::string& encodedFile) {
+bool EncodedImg::isValidImg() {
+	return width > 0 && heigth > 0
+		&& bufferLength > 0
+		&& buffer != nullptr;
+}
+
+int32_t EncodedImg::fromFile(const std::string& encodedFile) {
+	reset();
+
+	std::ifstream encFile(encodedFile, ios::in | ios::binary);
+	if (!encFile.is_open())
+		return ErrCode::kFileNotFound;
+
+	encFile.read((char*)&width, sizeof(width));
+	encFile.read((char*)&heigth, sizeof(heigth));
+	encFile.read((char*)&bufferLength, sizeof(bufferLength));
+	buffer = new double[bufferLength];
+
+	int32_t remainSize = bufferLength;
+	while (remainSize > SEGMENT_SIZE) {
+		encFile.read((char*)&buffer[bufferLength - remainSize], SEGMENT_SIZE * sizeof(buffer[0]));
+		remainSize -= SEGMENT_SIZE;
+	}
+
+	if (remainSize > 0) {
+		encFile.read((char*)&buffer[bufferLength - remainSize], remainSize * sizeof(buffer[0]));
+	}
+
+	encFile.close();
+
 	return ErrCode::kFailed;
+}
+
+int32_t EncodedImg::saveFile(const std::string& encodedFile) {
+	if (!isValidImg())
+		return ErrCode::kInvalidImg;
+
+	std::ofstream encFile(encodedFile, ios::out | ios::binary);
+	if (!encFile.is_open())
+		return ErrCode::kSaveFileFailed;
+
+	encFile.clear();
+
+	encFile.write((const char*)&width, sizeof(width));
+	encFile.write((const char*)&heigth, sizeof(heigth));
+	encFile.write((const char*)&bufferLength, sizeof(bufferLength));
+
+	int32_t segmentSize = 32768; // 32k
+	int32_t remainSize = bufferLength;
+	while (remainSize > segmentSize) {
+		encFile.write((const char*)&buffer[bufferLength - remainSize], segmentSize * sizeof(buffer[0]));
+		remainSize -= segmentSize;
+	}
+
+	if (remainSize > 0) {
+		encFile.write((const char*)&buffer[bufferLength - remainSize], remainSize * sizeof(buffer[0]));
+	}
+
+	encFile.close();
+	return ErrCode::kSuccess;
 }

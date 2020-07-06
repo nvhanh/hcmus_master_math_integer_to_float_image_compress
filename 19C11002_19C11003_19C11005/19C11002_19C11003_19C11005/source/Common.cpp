@@ -15,6 +15,12 @@ std::string& getErrStr(int32_t errCode) {
 	case ErrCode::kInvalidImg:
 		errStr = string("invalid image");
 		break;
+	case ErrCode::kSaveFileFailed:
+		errStr = string("save file faile");
+		break;
+	case ErrCode::kFileNotFound:
+		errStr = string("file not found");
+		break;
 	default:
 		break;
 	}

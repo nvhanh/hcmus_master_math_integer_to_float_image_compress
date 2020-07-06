@@ -25,14 +25,14 @@ inline void modifyBit(uint16_t& val, size_t pos, uint8_t bitVal) {
 int32_t ImgEncDec::encodeImg(const RawImg& rawImg, EncodedImg& encodedImg) {
 	encodedImg.reset();
 	
-	int32_t numfloatVal = (rawImg.bufferLength + 15) / 16;
+	int32_t numdoubleVal = (rawImg.bufferLength + 15) / 16;
 	encodedImg.width = rawImg.width;
 	encodedImg.heigth = rawImg.heigth;
-	encodedImg.bufferLength = numfloatVal;
-	encodedImg.buffer = new float[numfloatVal];
-	memset(encodedImg.buffer, 0, numfloatVal);
+	encodedImg.bufferLength = numdoubleVal;
+	encodedImg.buffer = new double[numdoubleVal];
+	memset(encodedImg.buffer, 0, numdoubleVal);
 
-	float powArr[8];
+	double powArr[8];
 	powArr[0] = pow(2, 128 - (0 + 1) * 16);
 	powArr[1] = pow(2, 128 - (1 + 1) * 16);
 	powArr[2] = pow(2, 128 - (2 + 1) * 16);
@@ -42,7 +42,7 @@ int32_t ImgEncDec::encodeImg(const RawImg& rawImg, EncodedImg& encodedImg) {
 	powArr[6] = pow(2, 128 - (6 + 1) * 16);
 	powArr[7] = pow(2, 128 - (7 + 1) * 16);
 
-	for (size_t chunk = 0; chunk < numfloatVal - 1; chunk++) {
+	for (size_t chunk = 0; chunk < numdoubleVal - 1; chunk++) {
 		encodedImg.buffer[chunk] = 0;
 
 		size_t rawBufferIdx = chunk * 16;
@@ -70,7 +70,8 @@ int32_t ImgEncDec::encodeImg(const RawImg& rawImg, EncodedImg& encodedImg) {
 		}
 	}
 
-	/// pading
+	/// TODO (hanhnv)
+	// padding
 
 	return ErrCode::kFailed;
 }
@@ -85,7 +86,7 @@ int32_t ImgEncDec::decodeImg(const EncodedImg& encodedImg, RawImg& decodedImg) {
 	decodedImg.buffer = new uint8_t[decodedImg.bufferLength];
 	memset(decodedImg.buffer, 0, decodedImg.bufferLength);
 
-	float powArr[8];
+	double powArr[8];
 	powArr[0] = pow(2, 128 - (0 + 1) * 16);
 	powArr[1] = pow(2, 128 - (1 + 1) * 16);
 	powArr[2] = pow(2, 128 - (2 + 1) * 16);
@@ -96,7 +97,7 @@ int32_t ImgEncDec::decodeImg(const EncodedImg& encodedImg, RawImg& decodedImg) {
 	powArr[7] = pow(2, 128 - (7 + 1) * 16);
 
 	for (size_t chunk = 0; chunk < encodedImg.bufferLength; chunk++) {
-		float chunkVal = encodedImg.buffer[chunk];
+		double chunkVal = encodedImg.buffer[chunk];
 		size_t rawBufferIdx = chunk * 16;
 		for (uint8_t bitPos = 0; bitPos < 8; bitPos++) {
 			uint16_t intVal = (uint16_t)(chunkVal / powArr[bitPos]);
