@@ -4,6 +4,10 @@
 
 BEG_NSP_APP();
 
+#define MAX_SHOW_WIDTH 1280
+#define MAX_SHOW_HEIGHT 720
+#define DEFAULT_WINDOWS_NAME "image"
+
 
 class RawImg {
 public:
@@ -14,7 +18,7 @@ public:
 
 	void reset();
 	bool isValidImg();
-	int32_t show(const std::string& windowsName = "image", int32_t maxWidth = 1280, int32_t maxHeigth = 720);
+	int32_t show(const std::string& windowsName = DEFAULT_WINDOWS_NAME, int32_t maxWidth = MAX_SHOW_WIDTH, int32_t maxHeigth = MAX_SHOW_HEIGHT);
 	int32_t save(const std::string& fileName);
 
 public:

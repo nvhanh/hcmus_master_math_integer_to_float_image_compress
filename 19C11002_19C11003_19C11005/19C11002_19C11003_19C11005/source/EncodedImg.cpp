@@ -1,4 +1,4 @@
-#include "EncodedImg.h"
+﻿#include "EncodedImg.h"
 #include <fstream>
 
 #define SEGMENT_SIZE 32768
@@ -66,6 +66,7 @@ int32_t EncodedImg::fromFile(const std::string& encodedFile) {
 	encFile.read((char*)&bufferLength, sizeof(bufferLength));
 	buffer = new double[bufferLength];
 
+	// Đọc file theo từng đoạn để tăng tốc độ
 	int32_t remainSize = bufferLength;
 	while (remainSize > SEGMENT_SIZE) {
 		encFile.read((char*)&buffer[bufferLength - remainSize], SEGMENT_SIZE * sizeof(buffer[0]));
@@ -95,11 +96,11 @@ int32_t EncodedImg::saveFile(const std::string& encodedFile) {
 	encFile.write((const char*)&heigth, sizeof(heigth));
 	encFile.write((const char*)&bufferLength, sizeof(bufferLength));
 
-	int32_t segmentSize = 32768; // 32k
+	// Ghi file theo từng đoạn để tăng tốc độ
 	int32_t remainSize = bufferLength;
-	while (remainSize > segmentSize) {
-		encFile.write((const char*)&buffer[bufferLength - remainSize], segmentSize * sizeof(buffer[0]));
-		remainSize -= segmentSize;
+	while (remainSize > SEGMENT_SIZE) {
+		encFile.write((const char*)&buffer[bufferLength - remainSize], SEGMENT_SIZE * sizeof(buffer[0]));
+		remainSize -= SEGMENT_SIZE;
 	}
 
 	if (remainSize > 0) {

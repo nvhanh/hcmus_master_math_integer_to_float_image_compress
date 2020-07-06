@@ -1,4 +1,4 @@
-#include "RawImg.h"
+﻿#include "RawImg.h"
 #include "opencv2/opencv.hpp"
 
 USG_NSP_APP();
@@ -30,10 +30,16 @@ RawImg::RawImg(const RawImg& otherImg) {
 
 RawImg::RawImg(const std::string& fileName) :
 RawImg() {
+	// Sử dụng thư viện OpenCV để load ảnh
 	cv::Mat rawImg = imread(fileName, IMREAD_COLOR);
 	if (rawImg.rows <= 0 || rawImg.cols <= 0)
 		return;
 
+	/// TODO (hanhnv)
+	// hỗ trợ thêm các định dạng phổ biến khác
+
+	// convert tất cả các định về RGB
+	// do hiện tại thuật toán hiện tại chỉ hỗ trợ định dạng này
 	Mat rgbImg;
 	rawImg.convertTo(rgbImg, CV_8UC3);
 
@@ -76,6 +82,12 @@ int32_t RawImg::show(const std::string& windowsName, int32_t maxWidth, int32_t m
 	if (width <= maxWidth && heigth <= maxHeigth)
 		imshow(windowsName, img);
 	else {
+		/// TODO (hanhnv)
+		// Không dùng độ phân giải tối đa mà sử dụng tỉ lệ theo kích thước màn hình
+		// để hỗ trợ các máy có độ phân giải cao không bị hiện tượng hình nhỏ
+
+		// Nếu ảnh lớn hơn kích thước hiển thị tối đa thì resize về giới hạn này,
+		// giữ nguyên tỉ lệ ảnh ban đầu
 		cv::Mat tmp = img.clone();
 		cv::Size curSize = tmp.size();
 		cv::Size newSize = curSize.width / (double)maxWidth > curSize.height / (double)maxHeigth

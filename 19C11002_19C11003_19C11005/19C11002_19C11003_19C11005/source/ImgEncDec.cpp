@@ -1,4 +1,4 @@
-#include "ImgEncDec.h"
+﻿#include "ImgEncDec.h"
 #include <math.h>
 #include <stdint.h>
 
@@ -32,6 +32,7 @@ int32_t ImgEncDec::encodeImg(const RawImg& rawImg, EncodedImg& encodedImg) {
 	encodedImg.buffer = new double[numdoubleVal];
 	memset(encodedImg.buffer, 0, numdoubleVal);
 
+	// Tính trước các giá trị lũy thừa nhằm giảm thời gian thực thi chương trình
 	double powArr[8];
 	powArr[0] = pow(2, 128 - (0 + 1) * 16);
 	powArr[1] = pow(2, 128 - (1 + 1) * 16);
@@ -42,13 +43,17 @@ int32_t ImgEncDec::encodeImg(const RawImg& rawImg, EncodedImg& encodedImg) {
 	powArr[6] = pow(2, 128 - (6 + 1) * 16);
 	powArr[7] = pow(2, 128 - (7 + 1) * 16);
 
+	// Mỗi 16 byte sẽ tạo thành một "chunk"
+	// và mã hóa vào một biến kiểu float hoặc double
 	for (size_t chunk = 0; chunk < numdoubleVal - 1; chunk++) {
 		encodedImg.buffer[chunk] = 0;
 
+		// Địa chỉ bắt đầu chunk trên buffer raw
 		size_t rawBufferIdx = chunk * 16;
 		for (uint8_t bitPos = 0; bitPos < 8; bitPos++) {
 			uint16_t intVal = 0;
 
+			// Chứa các bit cùng vị trí của 16 byte trong một số integer 2 byte
 			modifyBit(intVal, 0, getBit(rawImg.buffer[rawBufferIdx], 7 - bitPos));
 			modifyBit(intVal, 1, getBit(rawImg.buffer[rawBufferIdx + 1], 7 - bitPos));
 			modifyBit(intVal, 2, getBit(rawImg.buffer[rawBufferIdx + 2], 7 - bitPos));
@@ -66,12 +71,15 @@ int32_t ImgEncDec::encodeImg(const RawImg& rawImg, EncodedImg& encodedImg) {
 			modifyBit(intVal, 14, getBit(rawImg.buffer[rawBufferIdx + 14], 7 - bitPos));
 			modifyBit(intVal, 15, getBit(rawImg.buffer[rawBufferIdx + 15], 7 - bitPos));
 			
+			// Lưu các giá trị integer tạo ra vào một biến kiểu float hoặc double
+			// theo thứ tự các bit cao trước, các bit thấp sau
+			// Tức mã hóa 16 byte biểu diễn giá trị nguyên vào 4 hoặc 8 byte của kiểu số thực
 			encodedImg.buffer[chunk] += intVal * powArr[bitPos];
 		}
 	}
 
 	/// TODO (hanhnv)
-	// padding
+	// Thêm padding và mã hóa nhóm các byte cuối (nhỏ hơn 16 byte)
 
 	return ErrCode::kFailed;
 }
@@ -86,6 +94,7 @@ int32_t ImgEncDec::decodeImg(const EncodedImg& encodedImg, RawImg& decodedImg) {
 	decodedImg.buffer = new uint8_t[decodedImg.bufferLength];
 	memset(decodedImg.buffer, 0, decodedImg.bufferLength);
 
+	// Tính trước các giá trị lũy thừa nhằm giảm thời gian thực thi chương trình
 	double powArr[8];
 	powArr[0] = pow(2, 128 - (0 + 1) * 16);
 	powArr[1] = pow(2, 128 - (1 + 1) * 16);
@@ -96,10 +105,13 @@ int32_t ImgEncDec::decodeImg(const EncodedImg& encodedImg, RawImg& decodedImg) {
 	powArr[6] = pow(2, 128 - (6 + 1) * 16);
 	powArr[7] = pow(2, 128 - (7 + 1) * 16);
 
+	// Duyệt qua từng chunk và thử khôi phục 8 số integer 16-bit ban đầu
 	for (size_t chunk = 0; chunk < encodedImg.bufferLength; chunk++) {
 		double chunkVal = encodedImg.buffer[chunk];
+
 		size_t rawBufferIdx = chunk * 16;
 		for (uint8_t bitPos = 0; bitPos < 8; bitPos++) {
+			// Khôi phục số integer đại diện cho mỗi trị trí bit của 16 byte
 			uint16_t intVal = (uint16_t)(chunkVal / powArr[bitPos]);
 			chunkVal -= powArr[bitPos] * intVal;
 
